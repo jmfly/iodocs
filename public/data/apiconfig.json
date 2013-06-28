@@ -5,16 +5,22 @@
         "baseURL": "api.klout.com",
         "publicPath": "/v2",
         "headers" : {},
-        "auth": "key",
-        "keyParam": "key"
+        "auth": {
+            "key": {
+                "param": "key"
+            }
+        }
     },
     "usatoday": {
         "name": "USA TODAY Census API",
         "protocol": "http",
         "baseURL": "api.usatoday.com",
         "publicPath": "/open",
-        "auth": "key",
-        "keyParam": "api_key"
+        "auth": {
+            "key": {
+                "param": "api_key"
+            }
+        }
     },
     "linkedin": {
         "name": "LinkedIn",
@@ -22,16 +28,16 @@
         "baseURL": "api.linkedin.com",
         "publicPath": "",
         "privatePath": "/v1",
-        "auth": "oauth",
-        "oauth": {
-            "type": "three-legged",
-            "requestURL": "https://api.linkedin.com/uas/oauth/requestToken",
-            "signinURL":  "https://api.linkedin.com/uas/oauth/authorize?oauth_token=",
-            "accessURL":  "https://api.linkedin.com/uas/oauth/accessToken",
-            "version": "1.0",
-            "crypt": "HMAC-SHA1"
-        },
-        "keyParam":""
+        "auth": {
+	        "oauth": {
+	            "type": "three-legged",
+	            "requestURL": "https://api.linkedin.com/uas/oauth/requestToken",
+	            "signinURL":  "https://api.linkedin.com/uas/oauth/authorize?oauth_token=",
+	            "accessURL":  "https://api.linkedin.com/uas/oauth/accessToken",
+                "version": "1.0",
+                "crypt": "HMAC-SHA1"
+            }
+        }
     },
     "requestbin": {
         "name": "Requestb.in",

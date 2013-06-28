@@ -92,8 +92,11 @@ Example:
     "protocol": "http",
     "baseURL": "api.lowercase.sample.com",
     "publicPath": "/v1",
-    "auth": "key",
-    "keyParam": "api_key_var_name",
+    "auth": {
+        "key": {
+            "param": "api_key_var_name"
+        }
+    },
     "headers": {
                 "Accept": "application/json",
                 "Foo": "bar"
@@ -145,8 +148,11 @@ The *apiconfig.json* file contains high-level information about an API.
     "protocol": "http",
     "baseURL": "api.lowercase.sample.com",
     "publicPath": "/v1",
-    "auth": "key",
-    "keyParam": "api_key_var_name",
+    "auth": {
+        "key": {
+            "param": "api_key_var_name"
+        }
+    },
     "headers": {
                 "Accept": "application/json",
                 "Foo": "bar"
@@ -178,21 +184,17 @@ Line:
     In the Example #3 below, there is also "privatePath"
     which is used for endpoints behind protected resources.
 
-6. "auth" key value is the auth method. Valid values can be:
+6. "auth" object is the authentication method(s). Valid methods can be:
 
          "key" - simple API key in the URI
          "oauth1" - OAuth 1.0/1.0a
-         "" - no authentication
+         `null` - no authentication
 
-7. "keyParam" key value is name of the query parameter that
-    is added to an API request when the "auth" key value from
-    (5) is set to "key".
-
-8. "headers" object contains key value pairs of HTTP headers
+7. "headers" object contains key value pairs of HTTP headers
     that will be sent for each request for API. These are
     static key/value pairs.
 
-12. Closing curly-bracket ;)
+8. Closing curly-bracket ;)
 
 
 ---
@@ -205,8 +207,11 @@ Line:
    "protocol": "http",
    "baseURL": "api.upper.sample.com",
    "publicPath": "/v3",
-   "auth": "key",
-   "keyParam": "api_key_var_name",
+    "auth": {
+        "key": {
+            "param": "api_key_var_name"
+        }
+    },
    "signature": {
       "type": "signed_md5",
       "sigParam": "sig",
@@ -239,15 +244,11 @@ Line:
     In the Example #3 below, there is also "privatePath"
     which is used for endpoints behind protected resources.
 
-6. "auth" key value is the auth method. Valid values can be:
+6. "auth" object is the authentication method(s). Valid methods can be:
 
          "key" - simple API key in the URI
          "oauth1" - OAuth 1.0/1.0a
-         "" - no authentication
-
-7. "keyParam" key value is the name of the query parameter that
-    is added to an API request when the "auth" key value from
-    (5) is set to "key"
+         `null` - no authentication
 
 8. "signature" is a JSON object that contains the details about
    the API call signing requirements. The signature routine coded
@@ -283,16 +284,16 @@ Line:
     "privatePath": "/1",
     "booleanTrueVal": "true",
     "booleanFalseVal": "false",
-    "auth": "oauth",
-    "oauth" : {
-       "type": "three-legged",
-       "requestURL": "https://api.twitter.com/oauth/request_token",
-       "signinURL": "https://api.twitter.com/oauth/authorize?oauth_token=",
-       "accessURL": "https://api.twitter.com/oauth/access_token",
-       "version": "1.0",
-       "crypt": "HMAC-SHA1"
-   },
-   "keyParam": ""
+    "auth": {
+	    "oauth" : {
+	       "type": "three-legged",
+	       "requestURL": "https://api.twitter.com/oauth/request_token",
+	       "signinURL": "https://api.twitter.com/oauth/authorize?oauth_token=",
+	       "accessURL": "https://api.twitter.com/oauth/access_token",
+	       "version": "1.0",
+	       "crypt": "HMAC-SHA1"
+	   }
+	}
 }
 ```
 
@@ -342,8 +343,8 @@ Line:
     Ex: "false", "FALSE", "False", "f", "F", "0", etc.
     Default: "false"
 
-9. "auth" key value is set to "oauth" when OAuth is the
-    authentication mechanism. Field is required.
+9. "auth" object is set to "oauth" when OAuth is the
+    authentication method.
 
 10. "oauth" key value is a JSON object that contains the
     OAuth implementation details for this API. Field is

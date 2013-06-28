@@ -134,21 +134,21 @@ function oauth(req, res, next) {
     var apiName = req.body.apiName,
         apiConfig = apisConfig[apiName];
 
-    if (apiConfig.oauth) {
+    if (apiConfig.auth.oauth) {
         var apiKey = req.body.apiKey || req.body.key,
             apiSecret = req.body.apiSecret || req.body.secret,
             refererURL = url.parse(req.headers.referer),
             callbackURL = refererURL.protocol + '//' + refererURL.host + '/authSuccess/' + apiName,
-            oa = new OAuth(apiConfig.oauth.requestURL,
-                           apiConfig.oauth.accessURL,
+            oa = new OAuth(apiConfig.auth.oauth.requestURL,
+                           apiConfig.auth.oauth.accessURL,
                            apiKey,
                            apiSecret,
-                           apiConfig.oauth.version,
+                           apiConfig.auth.oauth.version,
                            callbackURL,
-                           apiConfig.oauth.crypt);
+                           apiConfig.auth.oauth.crypt);
 
         if (config.debug) {
-            console.log('OAuth type: ' + apiConfig.oauth.type);
+            console.log('OAuth type: ' + apiConfig.auth.oauth.type);
             console.log('Method security: ' + req.body.oauth);
             console.log('Session authed: ' + req.session[apiName]);
             console.log('apiKey: ' + apiKey);
@@ -156,7 +156,7 @@ function oauth(req, res, next) {
         };
 
         // Check if the API even uses OAuth, then if the method requires oauth, then if the session is not authed
-        if (apiConfig.oauth.type == 'three-legged' && req.body.oauth == 'authrequired' && (!req.session[apiName] || !req.session[apiName].authed) ) {
+        if (apiConfig.auth.oauth.type == 'three-legged' && req.body.oauth == 'authrequired' && (!req.session[apiName] || !req.session[apiName].authed) ) {
             if (config.debug) {
                 console.log('req.session: ' + util.inspect(req.session));
                 console.log('headers: ' + util.inspect(req.headers));
@@ -187,10 +187,10 @@ function oauth(req, res, next) {
                     db.expire(key + ':requestTokenSecret', 1209600000);
 
                     // res.header('Content-Type', 'application/json');
-                    res.send({ 'signin': apiConfig.oauth.signinURL + oauthToken });
+                    res.send({ 'signin': apiConfig.auth.oauth.signinURL + oauthToken });
                 }
             });
-        } else if (apiConfig.oauth.type == 'two-legged' && req.body.oauth == 'authrequired') {
+        } else if (apiConfig.auth.oauth.type == 'two-legged' && req.body.oauth == 'authrequired') {
             // Two legged stuff... for now nothing.
             next();
         } else {
@@ -240,13 +240,13 @@ function oauthSuccess(req, res, next) {
             console.log(util.inspect(">>"+req.query.oauth_verifier));
         };
 
-        var oa = new OAuth(apiConfig.oauth.requestURL,
-                           apiConfig.oauth.accessURL,
+        var oa = new OAuth(apiConfig.auth.oauth.requestURL,
+                           apiConfig.auth.oauth.accessURL,
                            apiKey,
                            apiSecret,
-                           apiConfig.oauth.version,
+                           apiConfig.auth.oauth.version,
                            null,
-                           apiConfig.oauth.crypt);
+                           apiConfig.auth.oauth.crypt);
 
         if (config.debug) {
             console.log(util.inspect(oa));
@@ -351,11 +351,11 @@ function processRequest(req, res, next) {
         var requestBody = query.stringify(params);
     }
 
-    if (apiConfig.oauth) {
+    if (apiConfig.auth.oauth) {
         console.log('Using OAuth');
 
         // Three legged OAuth
-        if (apiConfig.oauth.type == 'three-legged' && (reqQuery.oauth == 'authrequired' || (req.session[apiName] && req.session[apiName].authed))) {
+        if (apiConfig.auth.oauth.type == 'three-legged' && (reqQuery.oauth == 'authrequired' || (req.session[apiName] && req.session[apiName].authed))) {
             if (config.debug) {
                 console.log('Three Legged OAuth');
             };
@@ -376,13 +376,13 @@ function processRequest(req, res, next) {
                     console.log(accessToken);
                     console.log(accessTokenSecret);
                     
-                    var oa = new OAuth(apiConfig.oauth.requestURL || null,
-                                       apiConfig.oauth.accessURL || null,
+                    var oa = new OAuth(apiConfig.auth.oauth.requestURL || null,
+                                       apiConfig.auth.oauth.accessURL || null,
                                        apiKey || null,
                                        apiSecret || null,
-                                       apiConfig.oauth.version || null,
+                                       apiConfig.auth.oauth.version || null,
                                        null,
-                                       apiConfig.oauth.crypt);
+                                       apiConfig.auth.oauth.crypt);
 
                     if (config.debug) {
                         console.log('Access token: ' + accessToken);
@@ -415,7 +415,7 @@ function processRequest(req, res, next) {
                     });
                 }
             );
-        } else if (apiConfig.oauth.type == 'two-legged' && reqQuery.oauth == 'authrequired') { // Two-legged
+        } else if (apiConfig.auth.oauth.type == 'two-legged' && reqQuery.oauth == 'authrequired') { // Two-legged
             if (config.debug) {
                 console.log('Two Legged OAuth');
             };
@@ -425,9 +425,9 @@ function processRequest(req, res, next) {
                                null,
                                apiKey || null,
                                apiSecret || null,
-                               apiConfig.oauth.version || null,
+                               apiConfig.auth.oauth.version || null,
                                null,
-                               apiConfig.oauth.crypt);
+                               apiConfig.auth.oauth.crypt);
 
             var resource = options.protocol + '://' + options.host + options.path,
                 cb = function(error, data, response) {
@@ -513,7 +513,7 @@ function processRequest(req, res, next) {
             else {
                 options.path += '?';
             }
-            options.path += apiConfig.keyParam + '=' + apiKey;
+            options.path += apiConfig.auth.key.param + '=' + apiKey;
         }
 
         // Perform signature routine, if any.
