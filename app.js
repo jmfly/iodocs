@@ -44,20 +44,19 @@ try {
     process.exit(1);
 }
 
+if (process.env.REDISTOGO_URL) {
+	var rtg = require('url').parse(process.env.REDISTOGO_URL);
+	config.redis.port = rtg.port;
+	config.redis.host = rtg.hostname;
+	config.redis.password = rtg.auth.split(":")[1];
+}
+
 //
 // Redis connection
 //
 var defaultDB = '0';
-var db;
-
-if (process.env.REDISTOGO_URL) {
-    var rtg   = require("url").parse(process.env.REDISTOGO_URL);
-    db = require("redis").createClient(rtg.port, rtg.hostname);
-    db.auth(rtg.auth.split(":")[1]);
-} else {
-    db = redis.createClient(config.redis.port, config.redis.host);
-    db.auth(config.redis.password);
-}
+var db = redis.createClient(config.redis.port, config.redis.host);
+db.auth(config.redis.password);
 
 db.on("error", function(err) {
     if (config.debug) {
@@ -80,13 +79,6 @@ try {
 }
 
 var app = module.exports = express.createServer();
-
-if (process.env.REDISTOGO_URL) {
-    var rtg   = require("url").parse(process.env.REDISTOGO_URL);
-    config.redis.host = rtg.hostname;
-    config.redis.port = rtg.port;
-    config.redis.password = rtg.auth.split(":")[1];
-}
 
 app.configure(function() {
     app.set('views', __dirname + '/views');
@@ -727,7 +719,6 @@ app.get('/:api([^\.]+)', function(req, res) {
 });
 
 // Only listen on $ node app.js
-
 if (!module.parent) {
     var port = process.env.PORT || config.port;
     var l = app.listen(port);
